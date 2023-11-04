@@ -1,0 +1,63 @@
+{ config, lib, options, ... }:
+
+{
+  # Define your hardware configuration, such as your CPU, GPU, etc.
+  boot.initrd.availableKernelModules = [ "i915" "drm" "amdgpu" "nvidia" ];
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+  # Set the hostname for your system
+  networking.hostName = "my-nixos-wayland";
+
+  # Configure your network interface, if necessary
+  networking.useNetworkd = true;
+  networking.networkmanager.enable = true;
+
+  # Enable Wayland and Sway as your desktop environment
+  services.xserver.enable = true;
+  services.xserver.displayManager.waylandSession = {
+    enable = true;
+    displayManager = "sway";
+  };
+
+  # Install Hyprland and required packages
+  environment.systemPackages = with pkgs; [
+    # Add any additional packages you need
+    sway
+    waybar
+    mako
+  ];
+
+  # Configure Sway and Hyprland
+  programs.sway = {
+    enable = true;
+    extraPackages = [ hyprland ];
+  };
+
+  # Additional user-specific configurations, if needed
+  users.extraUsers.username = {
+    isNormalUser = true;
+    home = "/home/username";
+    extraGroups = [ "wheel" "networkmanager" ];  # Add your user to relevant groups
+  };
+
+  # Define your system's time zone
+  time.timeZone = "America/New_York";
+
+  # Define your preferred locale
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  # Enable sound support, if needed
+  sound.enable = true;
+
+  # Enable additional services like Bluetooth, if needed
+  services.bluez = {
+    enable = true;
+    autoStart = true;
+  };
+
+  # Add any other system-wide or user-specific configurations as needed
+
+  # Enable NixOS services you require, such as a web server, database, etc.
+}
